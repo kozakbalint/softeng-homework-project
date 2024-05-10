@@ -30,24 +30,24 @@ public class FoxGameState implements TwoPhaseMoveState<Position> {
     }
 
     @Override
-    public boolean isLegalMove(Position form, Position to) {
+    public boolean isLegalMove(Position from, Position to) {
         if (isPlayerOne())
-            return isOnBoard(form) && isPiece(form, Piece.FOX) && isOnBoard(to) && isEmpty(to);
+            return isOnBoard(from) && isPiece(from, Piece.FOX) && isOnBoard(to) && isEmpty(to) && isDiagonalMove(from, to);
         else
-            return isOnBoard(form) && isPiece(form, Piece.DOG) && isOnBoard(to) && isEmpty(to);
+            return isOnBoard(from) && isPiece(from, Piece.DOG) && isOnBoard(to) && isEmpty(to) && isForwardDiagonalMove(from, to);
     }
 
     @Override
     public void makeMove(Position from, Position to) {
-        Piece fromPiece = board[from.row()][from.row()];
+        Piece fromPiece = board[from.row()][from.col()];
         board[from.row()][from.col()] = Piece.EMPTY;
         board[to.row()][to.col()] = fromPiece;
-        player = player.opponent();
+        player = getNextPlayer();
     }
 
     @Override
     public Player getNextPlayer() {
-        return player;
+        return player.opponent();
     }
 
     @Override
@@ -56,7 +56,7 @@ public class FoxGameState implements TwoPhaseMoveState<Position> {
         if (!hasLegalMove(foxPosition, Player.PLAYER_1)) return true;
         var dogPositions = getDogsPosition();
         var lastDogRow = dogPositions.stream().map(Position::row).max(Integer::compareTo).orElseThrow();
-        return foxPosition.row() > lastDogRow;
+        return foxPosition.row() >= lastDogRow;
     }
 
     @Override
@@ -64,7 +64,7 @@ public class FoxGameState implements TwoPhaseMoveState<Position> {
         if (!isGameOver()) {
             return Status.IN_PROGRESS;
         }
-        return !isPlayerOne() ? Status.PLAYER_1_WINS : Status.PLAYER_2_WINS;
+        return isGameOver() && !hasLegalMove(getFoxPosition(), Player.PLAYER_1) ? Status.PLAYER_2_WINS : Status.PLAYER_1_WINS;
     }
 
     private Position getFoxPosition() {
@@ -88,8 +88,8 @@ public class FoxGameState implements TwoPhaseMoveState<Position> {
     }
 
     private boolean hasLegalMove(Position from, Player player) {
-        for (int i = from.row() - 1; i < from.row() + 1; i++) {
-            for (int j = from.col() - 1; j < from.col() + 1; j++) {
+        for (int i = from.row() - 1; i <= from.row() + 1; i++) {
+            for (int j = from.col() - 1; j <= from.col() + 1; j++) {
                 if (i == from.row() && j == from.col()) {
                     continue;
                 }
