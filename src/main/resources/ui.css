@@ -1,0 +1,15 @@
+.square-black {
+    -fx-background-color: rgb(181,136,99);
+}
+
+.square-white {
+    -fx-background-color: rgb(240,217,181);
+}
+
+.square-selected {
+    -fx-background-color: rgba(144,155,111,0.8);
+}
+
+.square-next {
+    -fx-fill: rgba(144,155,111,0.8);
+}
