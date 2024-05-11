@@ -23,6 +23,8 @@ public class Main {
         };
 
         TwoPhaseMoveGame<Position> cli = new TwoPhaseMoveGame<>(gameState, parser);
+        System.out.println("Usage: <row> <col>");
+        System.out.println("Example: 0 2");
         cli.start();
     }
 }
