@@ -1,23 +1,26 @@
 package foxgame.model;
 
 import game.TwoPhaseMoveState;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 
 import java.util.ArrayList;
 
 public class FoxGameState implements TwoPhaseMoveState<Position> {
     public static final int BOARD_SIZE = 8;
-    private Piece[][] board;
+    private ReadOnlyObjectWrapper<Piece>[][] board = new ReadOnlyObjectWrapper[BOARD_SIZE][BOARD_SIZE];
     private Player player;
 
     public FoxGameState() {
-        board = new Piece[BOARD_SIZE][BOARD_SIZE];
         for (int i = 0; i < BOARD_SIZE; i++) {
             for (int j = 0; j < BOARD_SIZE; j++) {
-                board[i][j] = Piece.EMPTY;
+                board[i][j] = new ReadOnlyObjectWrapper<>(Piece.EMPTY);
             }
         }
-        board[0][2] = Piece.FOX;
-        board[7][1] = board[7][3] = board[7][5] = board[7][7] = Piece.DOG;
+        board[0][2] = new ReadOnlyObjectWrapper<>(Piece.FOX);
+        for (int i = 1; i < 8; i+=2) {
+            board[7][i] = new ReadOnlyObjectWrapper<>(Piece.DOG);
+        }
         player = Player.PLAYER_1;
     }
 
@@ -39,9 +42,9 @@ public class FoxGameState implements TwoPhaseMoveState<Position> {
 
     @Override
     public void makeMove(Position from, Position to) {
-        Piece fromPiece = board[from.row()][from.col()];
-        board[from.row()][from.col()] = Piece.EMPTY;
-        board[to.row()][to.col()] = fromPiece;
+        Piece fromPiece = board[from.row()][from.col()].get();
+        board[from.row()][from.col()].set(Piece.EMPTY);
+        board[to.row()][to.col()].set(fromPiece);
         player = player.opponent();
     }
 
@@ -67,11 +70,15 @@ public class FoxGameState implements TwoPhaseMoveState<Position> {
         return isGameOver() && !hasLegalMove(getFoxPosition(), Player.PLAYER_1) ? Status.PLAYER_2_WINS : Status.PLAYER_1_WINS;
     }
 
+    public ReadOnlyObjectProperty<Piece> pieceProperty(int i, int j) {
+        return board[i][j].getReadOnlyProperty();
+    }
+
     private Position getFoxPosition() {
         var position = new Position(-1, -1);
         for (int i = 0; i < BOARD_SIZE; i++) {
             for (int j = 0; j < BOARD_SIZE; j++) {
-                if (board[i][j] == Piece.FOX) position = new Position(i, j);
+                if (board[i][j].get() == Piece.FOX) position = new Position(i, j);
             }
         }
         return position;
@@ -81,7 +88,26 @@ public class FoxGameState implements TwoPhaseMoveState<Position> {
         ArrayList<Position> positions = new ArrayList<>();
         for (int i = 0; i < BOARD_SIZE; i++) {
             for (int j = 0; j < BOARD_SIZE; j++) {
-                if (board[i][j] == Piece.DOG) positions.add(new Position(i, j));
+                if (board[i][j].get() == Piece.DOG) positions.add(new Position(i, j));
+            }
+        }
+        return positions;
+    }
+
+    public ArrayList<Position> getLegalMoves(Position from, Player player) {
+        ArrayList<Position> positions = new ArrayList<>();
+        for (int i = from.row() - 1; i <= from.row() + 1; i++) {
+            for (int j = from.col() - 1; j <= from.col() + 1; j++) {
+                if (i == from.row() && j == from.col()) {
+                    continue;
+                }
+                if (isPlayerOne(player) && isOnBoard(i, j) && isDiagonalMove(from, new Position(i, j)) && isEmpty(i, j)) {
+                    positions.add(new Position(i,j));
+                }
+
+                if (!isPlayerOne(player) && isOnBoard(i, j) && isForwardDiagonalMove(from, new Position(i, j)) && isEmpty(i, j)) {
+                    positions.add(new Position(i,j));
+                }
             }
         }
         return positions;
@@ -126,11 +152,11 @@ public class FoxGameState implements TwoPhaseMoveState<Position> {
     }
 
     private boolean isEmpty(int row, int col) {
-        return board[row][col] == Piece.EMPTY;
+        return board[row][col].get() == Piece.EMPTY;
     }
 
     private boolean isPiece(Position pos, Piece piece) {
-        return board[pos.row()][pos.col()] == piece;
+        return board[pos.row()][pos.col()].get() == piece;
     }
 
     private boolean isDiagonalMove(Position from, Position to) {
@@ -150,7 +176,7 @@ public class FoxGameState implements TwoPhaseMoveState<Position> {
         var sb = new StringBuilder();
         for (int i = 0; i < BOARD_SIZE; i++) {
             for (int j = 0; j < BOARD_SIZE; j++) {
-                switch (board[i][j]) {
+                switch (board[i][j].get()) {
                     case EMPTY -> sb.append("_ ");
                     case DOG -> sb.append("D ");
                     case FOX -> sb.append("F ");
