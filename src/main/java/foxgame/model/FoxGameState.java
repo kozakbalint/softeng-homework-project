@@ -42,12 +42,12 @@ public class FoxGameState implements TwoPhaseMoveState<Position> {
         Piece fromPiece = board[from.row()][from.col()];
         board[from.row()][from.col()] = Piece.EMPTY;
         board[to.row()][to.col()] = fromPiece;
-        player = getNextPlayer();
+        player = player.opponent();
     }
 
     @Override
     public Player getNextPlayer() {
-        return player.opponent();
+        return player;
     }
 
     @Override

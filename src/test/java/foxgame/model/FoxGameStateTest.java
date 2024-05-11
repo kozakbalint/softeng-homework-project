@@ -128,14 +128,20 @@ class FoxGameStateTest {
     @Test
     void getNextPlayer_PlayerOne_True() {
         gameState = new FoxGameState();
-        assertEquals(State.Player.PLAYER_2, gameState.getNextPlayer());
+        assertEquals(State.Player.PLAYER_1, gameState.getNextPlayer());
+        gameState.makeMove(new Position(0,2), new Position(1,1));
+        gameState.makeMove(new Position(7,7), new Position(6,6));
+        assertEquals(State.Player.PLAYER_1, gameState.getNextPlayer());
     }
 
     @Test
     void getNextPlayer_PlayerTwo_True() {
         gameState = new FoxGameState();
         gameState.makeMove(new Position(0,2), new Position(1,1));
-        assertEquals(State.Player.PLAYER_1, gameState.getNextPlayer());
+        assertEquals(State.Player.PLAYER_2, gameState.getNextPlayer());
+        gameState.makeMove(new Position(7,7), new Position(6,6));
+        gameState.makeMove(new Position(1,1), new Position(0,0));
+        assertEquals(State.Player.PLAYER_2, gameState.getNextPlayer());
     }
 
     @Test
