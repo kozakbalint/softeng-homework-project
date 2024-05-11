@@ -3,10 +3,10 @@
         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>hu.unideb.inf</groupId>
-    <artifactId>homework-template-project</artifactId>
+    <artifactId>fox-game</artifactId>
     <version>1.0</version>
     <packaging>jar</packaging>
-    <description>Model and UI for the Software Engineering and Technologies homework assignment no. 2.6.</description>
+    <description>Fox Game, a model and UI for the Software Engineering and Technologies homework assignment no. 2.6.</description>
     <developers>
         <developer>
             <name>Bálint Kozák</name>
@@ -24,7 +24,7 @@
         <jacoco.version>0.8.12</jacoco.version>
         <maven.checkstyle.version>3.3.1</maven.checkstyle.version>
         <maven.surefire.version>3.2.5</maven.surefire.version>
-        <exec.mainClass><!-- TODO: the fully-qualified class name of your class that contains the main() method to launch the application --></exec.mainClass>
+        <exec.mainClass>foxgame.gui.Main</exec.mainClass>
     </properties>
     <dependencies>
         <dependency>
