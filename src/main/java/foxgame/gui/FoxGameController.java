@@ -1,11 +1,15 @@
 package foxgame.gui;
 
+import com.sun.javafx.collections.ObservableListWrapper;
 import foxgame.model.FoxGameState;
 import foxgame.model.Piece;
 import foxgame.model.Position;
+import game.State;
 import game.util.TwoPhaseMoveSelector;
 import javafx.beans.binding.ObjectBinding;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ListView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -16,14 +20,26 @@ import org.tinylog.Logger;
 import util.javafx.EnumImageStorage;
 import util.javafx.ImageStorage;
 
+import java.io.IOException;
+import java.util.ArrayList;
+
 
 public class FoxGameController {
     @FXML
     private GridPane board;
 
+    @FXML
+    private ListView<String> moveHistory;
+
+    private int moveNum;
+
+    private ArrayList<String> itemList = new ArrayList<>();
+
+    ObservableListWrapper<String> items = new ObservableListWrapper<>(itemList);
+
     private FoxGameState gameState = new FoxGameState();
 
-    TwoPhaseMoveSelector<Position> moveSelector = new TwoPhaseMoveSelector<>(gameState);
+    private TwoPhaseMoveSelector<Position> moveSelector = new TwoPhaseMoveSelector<>(gameState);
 
     private ImageStorage<Piece> imageStorage = new EnumImageStorage<>(Piece.class);
 
@@ -35,6 +51,10 @@ public class FoxGameController {
                 board.add(square, j, i);
             }
         }
+
+        moveNum = 1;
+        moveHistory.setItems(items);
+        moveHistory.getStyleClass().add("list-view");
     }
 
     private StackPane createSquare(int i, int j) {
@@ -79,7 +99,13 @@ public class FoxGameController {
         }
         if (moveSelector.isReadyToMove()) {
             gameState.makeMove(moveSelector.getFrom(), moveSelector.getTo());
+            items.add(String.format("%d. %s -> %s", moveNum, moveSelector.getFrom(), moveSelector.getTo()));
+            moveNum += 1;
             reset();
+        }
+
+        if (gameState.isGameOver()) {
+            openModal();
         }
     }
 
@@ -120,5 +146,19 @@ public class FoxGameController {
         var circle = new Circle(maxRadius * 0.4);
         circle.getStyleClass().add("square-next");
         return circle;
+    }
+
+    private void openModal()  {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Game Over!");
+        alert.setGraphic(null);
+        alert.setHeaderText(null);
+        if (gameState.getStatus() == State.Status.PLAYER_1_WINS) {
+            alert.setContentText("Player One won.");
+        } else {
+            alert.setContentText("Player two won.");
+        }
+
+        alert.showAndWait();
     }
 }

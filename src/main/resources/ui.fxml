@@ -3,7 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="foxgame.gui.FoxGameController" stylesheets="ui.css">
+<HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" stylesheets="ui.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="foxgame.gui.FoxGameController">
    <children>
       <GridPane fx:id="board" prefHeight="400.0" prefWidth="400.0">
         <columnConstraints>
@@ -27,6 +27,6 @@
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
       </GridPane>
-      <ListView prefHeight="200.0" prefWidth="200.0" />
+      <ListView fx:id="moveHistory" prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: rgb(36,36,36);" />
    </children>
 </HBox>

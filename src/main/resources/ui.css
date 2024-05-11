@@ -13,3 +13,17 @@
 .square-next {
     -fx-fill: rgba(144,155,111,0.8);
 }
+
+.list-view {
+    -fx-background-color: rgb(36,36,36);
+}
+
+.list-view .list-cell {
+    -fx-background-color: rgb(36,36,36);
+    -fx-text-fill: rgb(255,255,255);
+    -fx-font-size: 16;
+}
+
+.list-view .scroll-bar:vertical {
+    -fx-background-color: rgb(100,100,100);
+}
