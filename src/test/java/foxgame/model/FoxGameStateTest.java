@@ -3,6 +3,8 @@ package foxgame.model;
 import game.State;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class FoxGameStateTest {
@@ -126,22 +128,22 @@ class FoxGameStateTest {
     }
 
     @Test
-    void getNextPlayer_PlayerOne_True() {
+    void getLegalMoves_PlayerOne() {
         gameState = new FoxGameState();
-        assertEquals(State.Player.PLAYER_1, gameState.getNextPlayer());
-        gameState.makeMove(new Position(0,2), new Position(1,1));
-        gameState.makeMove(new Position(7,7), new Position(6,6));
-        assertEquals(State.Player.PLAYER_1, gameState.getNextPlayer());
+        ArrayList<Position> possibleMoves = new ArrayList<>();
+        possibleMoves.add(new Position(1,1));
+        possibleMoves.add(new Position(1,3));
+        assertEquals(possibleMoves,gameState.getLegalMoves(new Position(0,2), State.Player.PLAYER_1));
     }
 
     @Test
-    void getNextPlayer_PlayerTwo_True() {
+    void getLegalMoves_PlayerTwo() {
         gameState = new FoxGameState();
         gameState.makeMove(new Position(0,2), new Position(1,1));
-        assertEquals(State.Player.PLAYER_2, gameState.getNextPlayer());
-        gameState.makeMove(new Position(7,7), new Position(6,6));
-        gameState.makeMove(new Position(1,1), new Position(0,0));
-        assertEquals(State.Player.PLAYER_2, gameState.getNextPlayer());
+        ArrayList<Position> possibleMoves = new ArrayList<>();
+        possibleMoves.add(new Position(6,2));
+        possibleMoves.add(new Position(6,4));
+        assertEquals(possibleMoves,gameState.getLegalMoves(new Position(7,3), State.Player.PLAYER_2));
     }
 
     @Test
