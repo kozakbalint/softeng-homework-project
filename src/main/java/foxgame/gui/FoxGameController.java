@@ -33,16 +33,12 @@ import java.util.Objects;
 
 
 public class FoxGameController {
+    ObservableList<ListViewItem> items;
     @FXML
     private GridPane board;
-
     @FXML
     private ListView<ListViewItem> moveHistory;
-
     private ArrayList<ListViewItem> moves;
-
-    ObservableList<ListViewItem> items;
-
     private FoxGameState gameState;
 
     private TwoPhaseMoveSelector<Position> moveSelector;
@@ -74,7 +70,7 @@ public class FoxGameController {
                     setText(null);
                     return;
                 }
-                if (item.move() != null){
+                if (item.move() != null) {
                     setText(String.format("from: %s\tto: %s", item.move().from(), item.move().to()));
                 } else {
                     setText(item.message());
@@ -84,7 +80,7 @@ public class FoxGameController {
 
         for (int i = 0; i < board.getRowCount(); i++) {
             for (int j = 0; j < board.getColumnCount(); j++) {
-                var square = createSquare(i ,j);
+                var square = createSquare(i, j);
                 board.add(square, j, i);
             }
         }
@@ -98,7 +94,7 @@ public class FoxGameController {
     @FXML
     private void onSave() {
         if (!savePath.getPath().isEmpty()) {
-            stateManager.saveState(new GameState(savePath.getName(), items.stream().map(ListViewItem::move).filter(Objects::nonNull).toList()),savePath.getPath());
+            stateManager.saveState(new GameState(savePath.getName(), items.stream().map(ListViewItem::move).filter(Objects::nonNull).toList()), savePath.getPath());
             return;
         }
         var fileChooser = new FileChooser();
@@ -106,7 +102,7 @@ public class FoxGameController {
         var file = fileChooser.showSaveDialog(null);
         if (file != null) {
             Logger.debug("Saving file: {}", file);
-            stateManager.saveState(new GameState(file.getName(),items.stream().map(ListViewItem::move).filter(Objects::nonNull).toList()),file.getPath());
+            stateManager.saveState(new GameState(file.getName(), items.stream().map(ListViewItem::move).filter(Objects::nonNull).toList()), file.getPath());
             savePath = new File(file.getAbsolutePath());
         }
     }
@@ -120,10 +116,10 @@ public class FoxGameController {
             Logger.debug("Opening file: {}", file);
             GameState loadState = stateManager.loadState(file.getPath());
             initialize();
-            stateManager.applyState(gameState,loadState);
+            stateManager.applyState(gameState, loadState);
             savePath = new File(file.getAbsolutePath());
-            for (int i = 0; i <loadState.moves().size(); i++) {
-                items.add(new ListViewItem(null,loadState.moves().get(i)));
+            for (int i = 0; i < loadState.moves().size(); i++) {
+                items.add(new ListViewItem(null, loadState.moves().get(i)));
             }
             if (gameState.isGameOver()) gameOver();
         }
@@ -179,7 +175,7 @@ public class FoxGameController {
         if (moveSelector.isReadyToMove()) {
             gameState.makeMove(moveSelector.getFrom(), moveSelector.getTo());
             var move = new TwoPhaseMoveState.TwoPhaseMove<>(moveSelector.getFrom(), moveSelector.getTo());
-            items.add(new ListViewItem(null,move));
+            items.add(new ListViewItem(null, move));
             reset();
         }
 
@@ -197,7 +193,7 @@ public class FoxGameController {
     private void removeMouseEventHandler() {
         for (int i = 0; i < FoxGameState.BOARD_SIZE; i++) {
             for (int j = 0; j < FoxGameState.BOARD_SIZE; j++) {
-                var square = getSquare(new Position(i,j));
+                var square = getSquare(new Position(i, j));
                 square.setOnMouseClicked(null);
             }
         }
@@ -206,20 +202,20 @@ public class FoxGameController {
     private void select(Position position) {
         moveSelector.select(position);
         if (moveSelector.getPhase() == TwoPhaseMoveSelector.Phase.SELECT_TO && !gameState.isGameOver()) {
-            var legalMoves = gameState.getLegalMoves(position,gameState.getNextPlayer());
+            var legalMoves = gameState.getLegalMoves(position, gameState.getNextPlayer());
             var square = getSquare(position);
             square.getStyleClass().add("square-selected");
-            for (var move: legalMoves) {
+            for (var move : legalMoves) {
                 var nextSquare = getSquare(move);
                 nextSquare.getChildren().add(makeCircle(nextSquare.getWidth(), nextSquare.getHeight()));
             }
         }
     }
 
-    private void reset(){
+    private void reset() {
         for (int i = 0; i < FoxGameState.BOARD_SIZE; i++) {
             for (int j = 0; j < FoxGameState.BOARD_SIZE; j++) {
-                var square = getSquare(new Position(i,j));
+                var square = getSquare(new Position(i, j));
                 square.getChildren().removeIf(node -> node.getStyleClass().contains("square-next"));
                 square.getStyleClass().remove("square-selected");
             }
@@ -238,13 +234,13 @@ public class FoxGameController {
     }
 
     private Circle makeCircle(double w, double h) {
-        double maxRadius = Math.min(w,h) / 2.0;
+        double maxRadius = Math.min(w, h) / 2.0;
         var circle = new Circle(maxRadius * 0.4);
         circle.getStyleClass().add("square-next");
         return circle;
     }
 
-    private void openModal()  {
+    private void openModal() {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Game Over!");
         alert.setGraphic(null);

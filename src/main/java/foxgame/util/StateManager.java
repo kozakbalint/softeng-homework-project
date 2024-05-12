@@ -38,7 +38,7 @@ public class StateManager {
     }
 
     public void applyState(FoxGameState gameState, GameState state) {
-        for (var move: state.moves()) {
+        for (var move : state.moves()) {
             if (gameState.isLegalMove(move.from(), move.to())) {
                 gameState.makeMove(move.from(), move.to());
             } else {
