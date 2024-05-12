@@ -18,7 +18,7 @@ public class FoxGameState implements TwoPhaseMoveState<Position> {
             }
         }
         board[0][2] = new ReadOnlyObjectWrapper<>(Piece.FOX);
-        for (int i = 1; i < 8; i+=2) {
+        for (int i = 1; i < 8; i += 2) {
             board[7][i] = new ReadOnlyObjectWrapper<>(Piece.DOG);
         }
         player = Player.PLAYER_1;
@@ -102,11 +102,11 @@ public class FoxGameState implements TwoPhaseMoveState<Position> {
                     continue;
                 }
                 if (isPlayerOne(player) && isOnBoard(i, j) && isDiagonalMove(from, new Position(i, j)) && isEmpty(i, j)) {
-                    positions.add(new Position(i,j));
+                    positions.add(new Position(i, j));
                 }
 
                 if (!isPlayerOne(player) && isOnBoard(i, j) && isForwardDiagonalMove(from, new Position(i, j)) && isEmpty(i, j)) {
-                    positions.add(new Position(i,j));
+                    positions.add(new Position(i, j));
                 }
             }
         }
