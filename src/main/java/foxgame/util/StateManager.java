@@ -23,7 +23,6 @@ public class StateManager {
         } catch (IOException e) {
             Logger.error(e);
         }
-        Logger.info("State loaded: " + gameState);
 
         return gameState;
     }
@@ -31,7 +30,6 @@ public class StateManager {
     public void saveState(GameState gameState, String savePath) {
         try (FileWriter writer = new FileWriter(savePath)) {
             gson.toJson(gameState, writer);
-            Logger.info("State saved to: " + new File(savePath).getAbsolutePath());
         } catch (IOException e) {
             Logger.error(e);
         }

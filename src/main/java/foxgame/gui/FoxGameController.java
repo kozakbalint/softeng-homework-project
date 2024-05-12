@@ -88,6 +88,7 @@ public class FoxGameController {
 
     @FXML
     private void onNew() {
+        Logger.debug("New Game started.");
         initialize();
     }
 
@@ -127,7 +128,7 @@ public class FoxGameController {
 
     @FXML
     private void onQuit() {
-        Logger.info("Terminating");
+        Logger.debug("Terminating");
         Platform.exit();
     }
 
@@ -163,16 +164,12 @@ public class FoxGameController {
         var row = GridPane.getRowIndex(square);
         var col = GridPane.getColumnIndex(square);
         var pos = new Position(row, col);
-        Logger.info("Clicked on " + pos);
 
         if (!gameState.isGameOver())
             select(pos);
 
-        if (moveSelector.isInvalidSelection()) {
-            reset();
-            return;
-        }
         if (moveSelector.isReadyToMove()) {
+            Logger.debug("Move from: {}, to: {}",moveSelector.getFrom(),moveSelector.getTo());
             gameState.makeMove(moveSelector.getFrom(), moveSelector.getTo());
             var move = new TwoPhaseMoveState.TwoPhaseMove<>(moveSelector.getFrom(), moveSelector.getTo());
             items.add(new ListViewItem(null, move));
@@ -185,6 +182,7 @@ public class FoxGameController {
     }
 
     private void gameOver() {
+        Logger.debug("Game Over");
         removeMouseEventHandler();
         moveHistory.getItems().add(new ListViewItem(gameState.getStatus().toString(), null));
         openModal();
@@ -201,6 +199,12 @@ public class FoxGameController {
 
     private void select(Position position) {
         moveSelector.select(position);
+        if (moveSelector.isInvalidSelection()) {
+            Logger.debug("Invalid selection: {}", position);
+            reset();
+            return;
+        }
+        Logger.debug("Selected: {}", position);
         if (moveSelector.getPhase() == TwoPhaseMoveSelector.Phase.SELECT_TO && !gameState.isGameOver()) {
             var legalMoves = gameState.getLegalMoves(position, gameState.getNextPlayer());
             var square = getSquare(position);
