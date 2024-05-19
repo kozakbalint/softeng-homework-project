@@ -15,6 +15,7 @@ public class GameStateManager {
         gson = new Gson();
     }
 
+
     public GameState loadState(String path) throws IOException {
         GameState gameState;
         try (FileReader reader = new FileReader(path)) {

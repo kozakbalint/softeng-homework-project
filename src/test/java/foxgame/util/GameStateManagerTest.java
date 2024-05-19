@@ -27,7 +27,7 @@ class GameStateManagerTest {
     @Test
     void saveState_success() throws IOException {
         gameStateManager = new GameStateManager();
-        gameState = new GameState("test", new ArrayList<>());
+        gameState = new GameState("test", "one", "two", new ArrayList<>());
         gameState.moves().add(new TwoPhaseMoveState.TwoPhaseMove<>(new Position(0, 2), new Position(1, 3)));
         gameState.moves().add(new TwoPhaseMoveState.TwoPhaseMove<>(new Position(7, 1), new Position(6, 0)));
         gameState.moves().add(new TwoPhaseMoveState.TwoPhaseMove<>(new Position(1, 3), new Position(2, 2)));
@@ -45,7 +45,7 @@ class GameStateManagerTest {
     @Test
     void saveState_failure() {
         gameStateManager = new GameStateManager();
-        GameState gameState = new GameState("test.json", new ArrayList<>());
+        GameState gameState = new GameState("test.json", "one", "two", new ArrayList<>());
         assertThrows(IOException.class, () -> gameStateManager.saveState(gameState, "nonexistent/test.json"));
         assertThrows(IOException.class, () -> gameStateManager.saveState(gameState, "/usr/bin/"));
     }
