@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import foxgame.model.FoxGameState;
 import org.tinylog.Logger;
 
-import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -17,7 +16,7 @@ public class StateManager {
     }
 
     public GameState loadState(String path) {
-        GameState gameState = new GameState(null, null);
+        GameState gameState = new GameState(null, null, null, null);
         try (FileReader reader = new FileReader(path)) {
             gameState = gson.fromJson(reader, GameState.class);
         } catch (IOException e) {

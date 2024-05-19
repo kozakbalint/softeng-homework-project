@@ -3,7 +3,9 @@ package foxgame.gui;
 import foxgame.model.FoxGameState;
 import foxgame.model.Piece;
 import foxgame.model.Position;
+import foxgame.util.GameResult;
 import foxgame.util.GameState;
+import foxgame.util.JsonGameResultManager;
 import foxgame.util.StateManager;
 import game.State;
 import game.util.TwoPhaseMoveSelector;
@@ -12,7 +14,11 @@ import javafx.beans.binding.ObjectBinding;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.image.Image;
@@ -22,12 +28,15 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Circle;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import org.tinylog.Logger;
 import puzzle.TwoPhaseMoveState;
 import util.javafx.EnumImageStorage;
 import util.javafx.ImageStorage;
 
 import java.io.File;
+import java.io.IOException;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -47,7 +56,12 @@ public class FoxGameController {
 
     private StateManager stateManager;
 
-    private File savePath;
+    private JsonGameResultManager jsonGameResultManager;
+
+    private File saveFile = new File("");
+
+    private String playerOneName;
+    private String playerTwoName;
 
     @FXML
     private void initialize() {
@@ -57,7 +71,7 @@ public class FoxGameController {
         gameState = new FoxGameState();
         moveSelector = new TwoPhaseMoveSelector<>(gameState);
         stateManager = new StateManager();
-        savePath = new File("");
+        jsonGameResultManager = new JsonGameResultManager("./results.json");
 
         moveHistory.setItems(items);
         moveHistory.getStyleClass().add("list-view");
@@ -84,6 +98,16 @@ public class FoxGameController {
                 board.add(square, j, i);
             }
         }
+
+        if (saveFile.getPath().isEmpty()) {
+            Logger.debug("New Game started.");
+        } else {
+            Logger.debug("Loading file: {}", saveFile);
+            var loadedState = stateManager.loadState(saveFile.getPath());
+            playerOneName = loadedState.playerOneName();
+            playerTwoName = loadedState.playerTwoName();
+            stateManager.applyState(gameState, loadedState);
+        }
     }
 
     @FXML
@@ -94,17 +118,18 @@ public class FoxGameController {
 
     @FXML
     private void onSave() {
-        if (!savePath.getPath().isEmpty()) {
-            stateManager.saveState(new GameState(savePath.getName(), items.stream().map(ListViewItem::move).filter(Objects::nonNull).toList()), savePath.getPath());
+        if (!saveFile.getPath().isEmpty()) {
+            stateManager.saveState(new GameState(saveFile.getName(), playerOneName, playerTwoName, items.stream().map(ListViewItem::move).filter(Objects::nonNull).toList()), saveFile.getPath());
             return;
         }
         var fileChooser = new FileChooser();
-        fileChooser.setTitle("Save");
+        fileChooser.setTitle("Save Game");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Fox Game Save Files", "*.fox"));
         var file = fileChooser.showSaveDialog(null);
         if (file != null) {
             Logger.debug("Saving file: {}", file);
-            stateManager.saveState(new GameState(file.getName(), items.stream().map(ListViewItem::move).filter(Objects::nonNull).toList()), file.getPath());
-            savePath = new File(file.getAbsolutePath());
+            stateManager.saveState(new GameState(file.getName(), playerOneName, playerTwoName, items.stream().map(ListViewItem::move).filter(Objects::nonNull).toList()), file.getPath());
+            saveFile = file;
         }
     }
 
@@ -112,13 +137,16 @@ public class FoxGameController {
     private void onLoad() {
         var fileChooser = new FileChooser();
         fileChooser.setTitle("Load");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Fox Game Save Files", "*.fox"));
         var file = fileChooser.showOpenDialog(null);
         if (file != null) {
             Logger.debug("Opening file: {}", file);
             GameState loadState = stateManager.loadState(file.getPath());
             initialize();
+            playerOneName = loadState.playerOneName();
+            playerTwoName = loadState.playerTwoName();
             stateManager.applyState(gameState, loadState);
-            savePath = new File(file.getAbsolutePath());
+            saveFile = file;
             for (int i = 0; i < loadState.moves().size(); i++) {
                 items.add(new ListViewItem(null, loadState.moves().get(i)));
             }
@@ -169,7 +197,7 @@ public class FoxGameController {
             select(pos);
 
         if (moveSelector.isReadyToMove()) {
-            Logger.debug("Move from: {}, to: {}",moveSelector.getFrom(),moveSelector.getTo());
+            Logger.debug("Move from: {}, to: {}", moveSelector.getFrom(), moveSelector.getTo());
             gameState.makeMove(moveSelector.getFrom(), moveSelector.getTo());
             var move = new TwoPhaseMoveState.TwoPhaseMove<>(moveSelector.getFrom(), moveSelector.getTo());
             items.add(new ListViewItem(null, move));
@@ -184,7 +212,15 @@ public class FoxGameController {
     private void gameOver() {
         Logger.debug("Game Over");
         removeMouseEventHandler();
-        moveHistory.getItems().add(new ListViewItem(gameState.getStatus().toString(), null));
+        var winner = gameState.getStatus() == State.Status.PLAYER_1_WINS ? playerOneName : playerTwoName;
+        try {
+            if (playerOneName != null && playerTwoName != null)
+                jsonGameResultManager.add(new GameResult(playerOneName, playerTwoName, winner, ZonedDateTime.now()));
+            else
+                throw new IllegalArgumentException("Player names are not set.");
+        } catch (Exception e) {
+            Logger.error("Error saving game result: {}", e.getMessage());
+        }
         openModal();
     }
 
@@ -249,12 +285,37 @@ public class FoxGameController {
         alert.setTitle("Game Over!");
         alert.setGraphic(null);
         alert.setHeaderText(null);
-        if (gameState.getStatus() == State.Status.PLAYER_1_WINS) {
-            alert.setContentText("Player one won.");
+        if ((gameState.getStatus() == State.Status.PLAYER_1_WINS)) {
+            alert.setHeaderText(playerOneName + " won!");
         } else {
-            alert.setContentText("Player two won.");
+            alert.setHeaderText(playerTwoName + " won!");
         }
+        alert.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                try {
+                    loadLeaderboard();
+                } catch (IOException e) {
+                    Logger.error("Error loading leaderboard: {}", e.getMessage());
+                }
+            }
+        });
+    }
 
-        alert.showAndWait();
+    private void loadLeaderboard() throws IOException {
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/leaderboard.fxml"));
+        Parent root = fxmlLoader.load();
+        Scene scene = new Scene(root);
+        Stage stage = (Stage) board.getScene().getWindow();
+        stage.setScene(scene);
+        stage.show();
+    }
+
+    public void setPlayerNames(String playerOneName, String playerTwoName) {
+        this.playerOneName = playerOneName;
+        this.playerTwoName = playerTwoName;
+    }
+
+    public void setSaveFile(File file) {
+        this.saveFile = file;
     }
 }
