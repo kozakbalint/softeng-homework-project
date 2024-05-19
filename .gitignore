@@ -184,4 +184,8 @@ dist/
 nbdist/
 .nb-gradle/
 
+### Fox Game Save and Result files ###
+results.json
+*.fox
+
 # End of https://www.toptal.com/developers/gitignore/api/intellij+all,netbeans,eclipse,maven
