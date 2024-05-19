@@ -188,4 +188,7 @@ nbdist/
 results.json
 *.fox
 
+### Fox Game Test files ###
+test.json
+
 # End of https://www.toptal.com/developers/gitignore/api/intellij+all,netbeans,eclipse,maven
