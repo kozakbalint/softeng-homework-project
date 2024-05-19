@@ -27,3 +27,18 @@
 .list-view .scroll-bar:vertical {
     -fx-background-color: rgb(100,100,100);
 }
+
+.menu-image {
+    -fx-background-image: url('menu.png');
+}
+
+.menu-title {
+    -fx-font-size: 100;
+    -fx-font-weight: bold;
+}
+
+.menu-title.label .text {
+    -fx-fill: rgb(255,255,255);
+    -fx-stroke: rgb(0,0,0);
+    -fx-stroke-width: 2;
+}
