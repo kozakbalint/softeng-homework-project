@@ -6,7 +6,7 @@ import foxgame.model.Position;
 import foxgame.util.GameResult;
 import foxgame.util.GameState;
 import foxgame.util.JsonGameResultManager;
-import foxgame.util.StateManager;
+import foxgame.util.GameStateManager;
 import game.State;
 import game.util.TwoPhaseMoveSelector;
 import javafx.application.Platform;
@@ -54,7 +54,7 @@ public class FoxGameController {
 
     private ImageStorage<Piece> imageStorage = new EnumImageStorage<>(Piece.class);
 
-    private StateManager stateManager;
+    private GameStateManager gameStateManager;
 
     private JsonGameResultManager jsonGameResultManager;
 
@@ -70,7 +70,7 @@ public class FoxGameController {
         items = FXCollections.observableArrayList(moves);
         gameState = new FoxGameState();
         moveSelector = new TwoPhaseMoveSelector<>(gameState);
-        stateManager = new StateManager();
+        gameStateManager = new GameStateManager();
         jsonGameResultManager = new JsonGameResultManager("./results.json");
 
         moveHistory.setItems(items);
@@ -103,10 +103,14 @@ public class FoxGameController {
             Logger.debug("New Game started.");
         } else {
             Logger.debug("Loading file: {}", saveFile);
-            var loadedState = stateManager.loadState(saveFile.getPath());
-            playerOneName = loadedState.playerOneName();
-            playerTwoName = loadedState.playerTwoName();
-            stateManager.applyState(gameState, loadedState);
+            try {
+                var loadedState = gameStateManager.loadState(saveFile.getPath());
+                playerOneName = loadedState.playerOneName();
+                playerTwoName = loadedState.playerTwoName();
+                gameStateManager.applyState(gameState, loadedState);
+            } catch (Exception e) {
+                Logger.error("Failed to load game state from file: {}", saveFile);
+            }
         }
     }
 
@@ -119,17 +123,25 @@ public class FoxGameController {
     @FXML
     private void onSave() {
         if (!saveFile.getPath().isEmpty()) {
-            stateManager.saveState(new GameState(saveFile.getName(), playerOneName, playerTwoName, items.stream().map(ListViewItem::move).filter(Objects::nonNull).toList()), saveFile.getPath());
-            return;
+            try {
+                gameStateManager.saveState(new GameState(saveFile.getName(),playerOneName,playerTwoName, items.stream().map(ListViewItem::move).filter(Objects::nonNull).toList()), saveFile.getPath());
+                return;
+            } catch (Exception e) {
+                Logger.error("Failed to save game state to file: {}", saveFile);
+            }
         }
         var fileChooser = new FileChooser();
         fileChooser.setTitle("Save Game");
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Fox Game Save Files", "*.fox"));
         var file = fileChooser.showSaveDialog(null);
         if (file != null) {
-            Logger.debug("Saving file: {}", file);
-            stateManager.saveState(new GameState(file.getName(), playerOneName, playerTwoName, items.stream().map(ListViewItem::move).filter(Objects::nonNull).toList()), file.getPath());
-            saveFile = file;
+            try {
+                Logger.debug("Saving file: {}", file);
+                gameStateManager.saveState(new GameState(file.getName(),playerOneName,playerTwoName, items.stream().map(ListViewItem::move).filter(Objects::nonNull).toList()), file.getPath());
+                saveFile = new File(file.getAbsolutePath());
+            } catch (Exception e) {
+                Logger.error("Failed to save game state to file: {}", file);
+            }
         }
     }
 
@@ -140,17 +152,22 @@ public class FoxGameController {
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Fox Game Save Files", "*.fox"));
         var file = fileChooser.showOpenDialog(null);
         if (file != null) {
-            Logger.debug("Opening file: {}", file);
-            GameState loadState = stateManager.loadState(file.getPath());
-            initialize();
-            playerOneName = loadState.playerOneName();
-            playerTwoName = loadState.playerTwoName();
-            stateManager.applyState(gameState, loadState);
-            saveFile = file;
-            for (int i = 0; i < loadState.moves().size(); i++) {
-                items.add(new ListViewItem(null, loadState.moves().get(i)));
+
+            try {
+                Logger.debug("Opening file: {}", file);
+                GameState loadState = gameStateManager.loadState(file.getPath());
+                initialize();
+                gameStateManager.applyState(gameState, loadState);
+                playerOneName = loadState.playerOneName();
+                playerTwoName = loadState.playerTwoName();
+                saveFile = new File(file.getAbsolutePath());
+                for (int i = 0; i < loadState.moves().size(); i++) {
+                    items.add(new ListViewItem(null, loadState.moves().get(i)));
+                }
+                if (gameState.isGameOver()) gameOver();
+            } catch (Exception e) {
+                Logger.error("Failed to load game state from file: {}", file);
             }
-            if (gameState.isGameOver()) gameOver();
         }
     }
 
