@@ -4,7 +4,7 @@ import foxgame.model.FoxGameState;
 import foxgame.model.Piece;
 import foxgame.model.Position;
 import foxgame.util.GameState;
-import foxgame.util.StateManager;
+import foxgame.util.GameStateManager;
 import game.State;
 import game.util.TwoPhaseMoveSelector;
 import javafx.application.Platform;
@@ -45,7 +45,7 @@ public class FoxGameController {
 
     private ImageStorage<Piece> imageStorage = new EnumImageStorage<>(Piece.class);
 
-    private StateManager stateManager;
+    private GameStateManager gameStateManager;
 
     private File savePath;
 
@@ -56,7 +56,7 @@ public class FoxGameController {
         items = FXCollections.observableArrayList(moves);
         gameState = new FoxGameState();
         moveSelector = new TwoPhaseMoveSelector<>(gameState);
-        stateManager = new StateManager();
+        gameStateManager = new GameStateManager();
         savePath = new File("");
 
         moveHistory.setItems(items);
@@ -95,16 +95,24 @@ public class FoxGameController {
     @FXML
     private void onSave() {
         if (!savePath.getPath().isEmpty()) {
-            stateManager.saveState(new GameState(savePath.getName(), items.stream().map(ListViewItem::move).filter(Objects::nonNull).toList()), savePath.getPath());
-            return;
+            try {
+                gameStateManager.saveState(new GameState(savePath.getName(), items.stream().map(ListViewItem::move).filter(Objects::nonNull).toList()), savePath.getPath());
+                return;
+            } catch (Exception e) {
+                Logger.error("Failed to save game state to file: {}", savePath);
+            }
         }
         var fileChooser = new FileChooser();
         fileChooser.setTitle("Save");
         var file = fileChooser.showSaveDialog(null);
         if (file != null) {
-            Logger.debug("Saving file: {}", file);
-            stateManager.saveState(new GameState(file.getName(), items.stream().map(ListViewItem::move).filter(Objects::nonNull).toList()), file.getPath());
-            savePath = new File(file.getAbsolutePath());
+            try {
+                Logger.debug("Saving file: {}", file);
+                gameStateManager.saveState(new GameState(file.getName(), items.stream().map(ListViewItem::move).filter(Objects::nonNull).toList()), file.getPath());
+                savePath = new File(file.getAbsolutePath());
+            } catch (Exception e) {
+                Logger.error("Failed to save game state to file: {}", file);
+            }
         }
     }
 
@@ -114,15 +122,19 @@ public class FoxGameController {
         fileChooser.setTitle("Load");
         var file = fileChooser.showOpenDialog(null);
         if (file != null) {
-            Logger.debug("Opening file: {}", file);
-            GameState loadState = stateManager.loadState(file.getPath());
-            initialize();
-            stateManager.applyState(gameState, loadState);
-            savePath = new File(file.getAbsolutePath());
-            for (int i = 0; i < loadState.moves().size(); i++) {
-                items.add(new ListViewItem(null, loadState.moves().get(i)));
+            try {
+                Logger.debug("Opening file: {}", file);
+                GameState loadState = gameStateManager.loadState(file.getPath());
+                initialize();
+                gameStateManager.applyState(gameState, loadState);
+                savePath = new File(file.getAbsolutePath());
+                for (int i = 0; i < loadState.moves().size(); i++) {
+                    items.add(new ListViewItem(null, loadState.moves().get(i)));
+                }
+                if (gameState.isGameOver()) gameOver();
+            } catch (Exception e) {
+                Logger.error("Failed to load game state from file: {}", file);
             }
-            if (gameState.isGameOver()) gameOver();
         }
     }
 
@@ -169,7 +181,7 @@ public class FoxGameController {
             select(pos);
 
         if (moveSelector.isReadyToMove()) {
-            Logger.debug("Move from: {}, to: {}",moveSelector.getFrom(),moveSelector.getTo());
+            Logger.debug("Move from: {}, to: {}", moveSelector.getFrom(), moveSelector.getTo());
             gameState.makeMove(moveSelector.getFrom(), moveSelector.getTo());
             var move = new TwoPhaseMoveState.TwoPhaseMove<>(moveSelector.getFrom(), moveSelector.getTo());
             items.add(new ListViewItem(null, move));
