@@ -12,6 +12,9 @@ import org.tinylog.Logger;
 
 import java.io.IOException;
 
+/**
+ * Controller for the main menu view.
+ */
 public class MenuController {
 
     public void onNewGame(ActionEvent actionEvent) {
@@ -31,7 +34,7 @@ public class MenuController {
         if (file != null) {
             Logger.debug("Opening file: {}", file);
             try {
-                FoxGameController controller = new FoxGameController();
+                GameController controller = new GameController();
                 controller.setSaveFile(file);
                 loadStage("/game.fxml", actionEvent, controller);
             } catch (IOException e) {

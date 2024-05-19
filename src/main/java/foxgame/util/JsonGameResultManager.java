@@ -14,6 +14,9 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A {@link GameResultManager} that stores game results in a JSON file.
+ */
 public class JsonGameResultManager implements GameResultManager {
     private final String path;
     Type gameResultsType = new TypeToken<List<GameResult>>() {
@@ -23,10 +26,20 @@ public class JsonGameResultManager implements GameResultManager {
             .setPrettyPrinting()
             .create();
 
+    /**
+     * Constructs a new {@code JsonGameResultManager}.
+     * @param path the path to the JSON file
+     */
     public JsonGameResultManager(String path) {
         this.path = path;
     }
 
+    /**
+     * Adds a game result to the manager.
+     *
+     * @param gameResult the {@link GameResult} to add
+     * @throws IOException if an I/O error occurs
+     */
     @Override
     public void add(GameResult gameResult) throws IOException {
         var results = getGameResults();
@@ -36,6 +49,10 @@ public class JsonGameResultManager implements GameResultManager {
         }
     }
 
+    /**
+     * {@return the list of all game results}
+     * @throws IOException if an I/O error occurs
+     */
     @Override
     public List<GameResult> getGameResults() throws IOException {
         if (!Files.exists(Path.of(path))) {

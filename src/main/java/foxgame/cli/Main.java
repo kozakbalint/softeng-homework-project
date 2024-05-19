@@ -5,8 +5,10 @@ import foxgame.model.Position;
 import game.console.TwoPhaseMoveGame;
 
 import java.util.Scanner;
-import java.util.function.Function;
 
+/**
+ * The entry point of the cli.
+ */
 public class Main {
     public static void main(String[] args) {
         FoxGameState gameState = new FoxGameState();
@@ -17,6 +19,13 @@ public class Main {
         cli.start();
     }
 
+    /**
+     * Parses a {@link Position} from the given string.
+     *
+     * @param s the string to parse
+     * @return the {@link Position} parsed from the given string
+     * @throws IllegalArgumentException if the given string is not in the correct format
+     */
     public static Position parsePosition(String s) {
         s = s.trim();
         if (!s.matches("\\d+\\s+\\d+")) {
