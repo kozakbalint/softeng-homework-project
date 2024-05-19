@@ -125,6 +125,11 @@ class FoxGameStateTest {
 
     @Test
     void makeMove() {
+        gameState = new FoxGameState();
+        gameState.makeMove(new Position(0,2), new Position(1,1));
+        assertEquals(State.Player.PLAYER_2, gameState.getNextPlayer());
+        assertEquals(Piece.EMPTY, gameState.pieceProperty(0,2).get());
+        assertEquals(Piece.FOX, gameState.pieceProperty(1,1).get());
     }
 
     @Test
