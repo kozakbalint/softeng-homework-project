@@ -6,11 +6,21 @@ import javafx.beans.property.ReadOnlyObjectWrapper;
 
 import java.util.ArrayList;
 
+/**
+ * Represents the state of the game.
+ */
 public class FoxGameState implements TwoPhaseMoveState<Position> {
+
+    /**
+     * The size of the board.
+     */
     public static final int BOARD_SIZE = 8;
     private ReadOnlyObjectWrapper<Piece>[][] board = new ReadOnlyObjectWrapper[BOARD_SIZE][BOARD_SIZE];
     private Player player;
 
+    /**
+     * Constructs a new {@code FoxGameState} object that represents the initial state of the game.
+     */
     public FoxGameState() {
         for (int i = 0; i < BOARD_SIZE; i++) {
             for (int j = 0; j < BOARD_SIZE; j++) {
@@ -24,6 +34,10 @@ public class FoxGameState implements TwoPhaseMoveState<Position> {
         player = Player.PLAYER_1;
     }
 
+    /**
+     * {@return whether it is legal to move from the given {@link Position}}
+     * @param from the {@link Position} to move from
+     */
     @Override
     public boolean isLegalToMoveFrom(Position from) {
         if (isPlayerOne())
@@ -32,6 +46,11 @@ public class FoxGameState implements TwoPhaseMoveState<Position> {
             return isOnBoard(from) && isPiece(from, Piece.DOG) && hasLegalMove(from, player);
     }
 
+    /**
+     * {@return whether it is legal to move from the given {@link Position} to another {@link Position}}
+     * @param from the {@link Position} to move from
+     * @param to the {@link Position} to move to
+     */
     @Override
     public boolean isLegalMove(Position from, Position to) {
         if (isPlayerOne())
@@ -40,6 +59,11 @@ public class FoxGameState implements TwoPhaseMoveState<Position> {
             return isOnBoard(from) && isPiece(from, Piece.DOG) && isOnBoard(to) && isEmpty(to) && isForwardDiagonalMove(from, to);
     }
 
+    /**
+     * Makes a move from the given {@link Position} to another {@link Position}.
+     * @param from the {@link Position} to move from
+     * @param to the {@link Position} to move to
+     */
     @Override
     public void makeMove(Position from, Position to) {
         Piece fromPiece = board[from.row()][from.col()].get();
@@ -48,11 +72,17 @@ public class FoxGameState implements TwoPhaseMoveState<Position> {
         player = player.opponent();
     }
 
+    /**
+     * {@return the {@link Player} whose turn currently is}
+     */
     @Override
     public Player getNextPlayer() {
         return player;
     }
 
+    /**
+     * {@return whether the game is over or not}
+     */
     @Override
     public boolean isGameOver() {
         var foxPosition = getFoxPosition();
@@ -62,6 +92,9 @@ public class FoxGameState implements TwoPhaseMoveState<Position> {
         return foxPosition.row() >= lastDogRow;
     }
 
+    /**
+     * {@return the {@link Status} of the game}
+     */
     @Override
     public Status getStatus() {
         if (!isGameOver()) {
@@ -70,6 +103,11 @@ public class FoxGameState implements TwoPhaseMoveState<Position> {
         return isGameOver() && !hasLegalMove(getFoxPosition(), Player.PLAYER_1) ? Status.PLAYER_2_WINS : Status.PLAYER_1_WINS;
     }
 
+    /**
+     * {@return the {@link Piece} at the given row and column index of the board}
+     * @param i the row of the {@code board}
+     * @param j the column of the {@code board}
+     */
     public ReadOnlyObjectProperty<Piece> pieceProperty(int i, int j) {
         return board[i][j].getReadOnlyProperty();
     }
@@ -94,6 +132,11 @@ public class FoxGameState implements TwoPhaseMoveState<Position> {
         return positions;
     }
 
+    /**
+     * {@return the legal moves from the given {@link Position} for the given {@link Player}}
+     * @param from the {@link Position} to move from
+     * @param player the {@link Player} to move
+     */
     public ArrayList<Position> getLegalMoves(Position from, Player player) {
         ArrayList<Position> positions = new ArrayList<>();
         for (int i = from.row() - 1; i <= from.row() + 1; i++) {
