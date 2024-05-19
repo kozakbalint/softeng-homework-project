@@ -9,7 +9,17 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
+/**
+ * Main class for the Fox Game application.
+ */
 public class FoxGameApplication extends Application {
+
+    /**
+     * Start the JavaFX application.
+     *
+     * @param stage the primary stage for this application
+     * @throws IOException if am error occurs during the loading of the FXML file
+     */
     @Override
     public void start(Stage stage) throws IOException {
         Parent root = FXMLLoader.load(getClass().getResource("/menu.fxml"));

@@ -19,6 +19,9 @@ import org.tinylog.Logger;
 
 import java.io.IOException;
 
+/**
+ * Controller for the leaderboard view.
+ */
 public class LeaderboardController {
     @FXML
     private TableView<PlayerStats> tableView;

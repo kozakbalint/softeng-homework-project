@@ -40,8 +40,10 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Objects;
 
-
-public class FoxGameController {
+/**
+ * Controller for the game view.
+ */
+public class GameController {
     ObservableList<ListViewItem> items;
     @FXML
     private GridPane board;

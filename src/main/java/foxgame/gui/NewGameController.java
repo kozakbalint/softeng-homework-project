@@ -13,6 +13,9 @@ import org.tinylog.Logger;
 
 import java.io.IOException;
 
+/**
+ * Controller for the new game view.
+ */
 public class NewGameController {
     @FXML
     private Button newgameButton;
@@ -32,7 +35,7 @@ public class NewGameController {
 
     public void onNewGame(ActionEvent event) throws IOException {
         Logger.debug("Starting new game with players {} and {}", playerOneNameField.getText(), playerTwoNameField.getText());
-        FoxGameController controller = new FoxGameController();
+        GameController controller = new GameController();
         controller.setPlayerNames(playerOneNameField.getText(), playerTwoNameField.getText());
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/game.fxml"));
         fxmlLoader.setController(controller);
