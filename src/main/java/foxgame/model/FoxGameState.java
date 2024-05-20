@@ -5,6 +5,8 @@ import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * Represents the state of the game.
@@ -212,6 +214,28 @@ public class FoxGameState implements TwoPhaseMoveState<Position> {
         int rowDiff = from.row() - to.row();
         int colDiff = Math.abs(from.col() - to.col());
         return rowDiff == 1 && colDiff == 1;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        FoxGameState gameState = (FoxGameState) o;
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            for (int j = 0; j < BOARD_SIZE; j++) {
+                if (board[i][j].get() != gameState.board[i][j].get()) {
+                    return false;
+                }
+            }
+        }
+        return player == gameState.player;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Objects.hash(player);
+        result = 31 * result + Arrays.deepHashCode(board);
+        return result;
     }
 
     @Override

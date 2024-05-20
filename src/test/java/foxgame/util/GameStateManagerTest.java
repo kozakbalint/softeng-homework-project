@@ -1,5 +1,6 @@
 package foxgame.util;
 
+import foxgame.model.FoxGameState;
 import foxgame.model.Position;
 import org.junit.jupiter.api.Test;
 import puzzle.TwoPhaseMoveState;
@@ -48,5 +49,27 @@ class GameStateManagerTest {
         GameState gameState = new GameState("test.json", "one", "two", new ArrayList<>());
         assertThrows(IOException.class, () -> gameStateManager.saveState(gameState, "nonexistent/test.json"));
         assertThrows(IOException.class, () -> gameStateManager.saveState(gameState, "/usr/bin/"));
+    }
+
+    @Test
+    void applyState_success() throws IOException {
+        gameStateManager = new GameStateManager();
+        FoxGameState gameState = new FoxGameState();
+        FoxGameState gameState2 = new FoxGameState();
+        GameState loadedGameState = gameStateManager.loadState(getClass().getResource("/test.json").getPath());
+        gameStateManager.applyState(gameState, loadedGameState);
+        gameState2.makeMove(loadedGameState.moves().get(0).from(), loadedGameState.moves().get(0).to());
+        gameState2.makeMove(loadedGameState.moves().get(1).from(), loadedGameState.moves().get(1).to());
+        gameState2.makeMove(loadedGameState.moves().get(2).from(), loadedGameState.moves().get(2).to());
+
+        assertEquals(gameState, gameState2);
+    }
+
+    @Test
+    void applyState_failure() throws IOException {
+        gameStateManager = new GameStateManager();
+        FoxGameState gameState = new FoxGameState();
+        GameState loadedGameState = gameStateManager.loadState(getClass().getResource("/test_bad.json").getPath());
+        assertThrows(IllegalStateException.class, () -> gameStateManager.applyState(gameState, loadedGameState));
     }
 }
