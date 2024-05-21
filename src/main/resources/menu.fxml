@@ -1,26 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import javafx.scene.effect.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
-
-<VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="600.0" spacing="25.0" styleClass="menu-image" stylesheets="ui.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="foxgame.gui.MenuController">
-   <children>
-      <Label alignment="CENTER" style="-fx-font-weight: bold;" styleClass="menu-title" text="Fox Game" textAlignment="CENTER" textFill="WHITE">
-         <font>
-            <Font size="42.0" />
-         </font>
-         <effect>
-            <Glow />
-         </effect>
-      </Label>
-      <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="15.0">
-         <children>
-            <Button mnemonicParsing="false" onAction="#onNewGame" text="New Game" />
-            <Button mnemonicParsing="false" onAction="#onLoadGame" text="Load Game" />
-            <Button mnemonicParsing="false" onAction="#onQuit" text="Quit" />
-         </children>
-      </VBox>
-   </children>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.effect.Glow?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<VBox xmlns:fx="http://javafx.com/fxml/1" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+      minWidth="-Infinity" prefHeight="600.0" prefWidth="600.0" spacing="25.0" styleClass="menu-image"
+      stylesheets="ui.css" xmlns="http://javafx.com/javafx/17.0.2-ea"
+      fx:controller="foxgame.gui.MenuController">
+    <children>
+        <Label alignment="CENTER" style="-fx-font-weight: bold;" styleClass="menu-title" text="Fox Game"
+               textAlignment="CENTER" textFill="WHITE">
+            <font>
+                <Font size="42.0"/>
+            </font>
+            <effect>
+                <Glow/>
+            </effect>
+        </Label>
+        <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="15.0">
+            <children>
+                <Button mnemonicParsing="false" onAction="#onNewGame" text="New Game"/>
+                <Button mnemonicParsing="false" onAction="#onLoadGame" text="Load Game"/>
+                <Button mnemonicParsing="false" onAction="#onQuit" text="Quit"/>
+            </children>
+        </VBox>
+    </children>
 </VBox>

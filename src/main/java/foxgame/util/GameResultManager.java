@@ -21,12 +21,14 @@ public interface GameResultManager {
 
     /**
      * {@return the list of all game results}
+     *
      * @throws IOException if an I/O error occurs
      */
     List<GameResult> getGameResults() throws IOException;
 
     /**
      * {@return the list of the best players, sorted by the number of wins in descending order, limited to {@code limit} players}
+     *
      * @param limit the number of players to return
      * @throws IOException if an I/O error occurs
      */
