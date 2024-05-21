@@ -28,6 +28,7 @@ public class JsonGameResultManager implements GameResultManager {
 
     /**
      * Constructs a new {@code JsonGameResultManager}.
+     *
      * @param path the path to the JSON file
      */
     public JsonGameResultManager(String path) {
@@ -51,6 +52,7 @@ public class JsonGameResultManager implements GameResultManager {
 
     /**
      * {@return the list of all game results}
+     *
      * @throws IOException if an I/O error occurs
      */
     @Override

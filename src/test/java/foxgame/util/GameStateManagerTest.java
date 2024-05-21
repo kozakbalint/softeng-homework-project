@@ -8,7 +8,8 @@ import puzzle.TwoPhaseMoveState;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class GameStateManagerTest {
     GameStateManager gameStateManager;

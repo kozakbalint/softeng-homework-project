@@ -5,8 +5,8 @@ import foxgame.model.Piece;
 import foxgame.model.Position;
 import foxgame.util.GameResult;
 import foxgame.util.GameState;
-import foxgame.util.JsonGameResultManager;
 import foxgame.util.GameStateManager;
+import foxgame.util.JsonGameResultManager;
 import game.State;
 import game.util.TwoPhaseMoveSelector;
 import javafx.application.Platform;
@@ -126,7 +126,7 @@ public class GameController {
     private void onSave() {
         if (!saveFile.getPath().isEmpty()) {
             try {
-                gameStateManager.saveState(new GameState(saveFile.getName(),playerOneName,playerTwoName, items.stream().map(ListViewItem::move).filter(Objects::nonNull).toList()), saveFile.getPath());
+                gameStateManager.saveState(new GameState(saveFile.getName(), playerOneName, playerTwoName, items.stream().map(ListViewItem::move).filter(Objects::nonNull).toList()), saveFile.getPath());
                 return;
             } catch (Exception e) {
                 Logger.error("Failed to save game state to file: {}", saveFile);
@@ -139,7 +139,7 @@ public class GameController {
         if (file != null) {
             try {
                 Logger.debug("Saving file: {}", file);
-                gameStateManager.saveState(new GameState(file.getName(),playerOneName,playerTwoName, items.stream().map(ListViewItem::move).filter(Objects::nonNull).toList()), file.getPath());
+                gameStateManager.saveState(new GameState(file.getName(), playerOneName, playerTwoName, items.stream().map(ListViewItem::move).filter(Objects::nonNull).toList()), file.getPath());
                 saveFile = new File(file.getAbsolutePath());
             } catch (Exception e) {
                 Logger.error("Failed to save game state to file: {}", file);

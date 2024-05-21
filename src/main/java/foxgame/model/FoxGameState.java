@@ -38,6 +38,7 @@ public class FoxGameState implements TwoPhaseMoveState<Position> {
 
     /**
      * {@return whether it is legal to move from the given {@link Position}}
+     *
      * @param from the {@link Position} to move from
      */
     @Override
@@ -50,8 +51,9 @@ public class FoxGameState implements TwoPhaseMoveState<Position> {
 
     /**
      * {@return whether it is legal to move from the given {@link Position} to another {@link Position}}
+     *
      * @param from the {@link Position} to move from
-     * @param to the {@link Position} to move to
+     * @param to   the {@link Position} to move to
      */
     @Override
     public boolean isLegalMove(Position from, Position to) {
@@ -63,8 +65,9 @@ public class FoxGameState implements TwoPhaseMoveState<Position> {
 
     /**
      * Makes a move from the given {@link Position} to another {@link Position}.
+     *
      * @param from the {@link Position} to move from
-     * @param to the {@link Position} to move to
+     * @param to   the {@link Position} to move to
      */
     @Override
     public void makeMove(Position from, Position to) {
@@ -107,6 +110,7 @@ public class FoxGameState implements TwoPhaseMoveState<Position> {
 
     /**
      * {@return the {@link Piece} at the given row and column index of the board}
+     *
      * @param i the row of the {@code board}
      * @param j the column of the {@code board}
      */
@@ -136,7 +140,8 @@ public class FoxGameState implements TwoPhaseMoveState<Position> {
 
     /**
      * {@return the legal moves from the given {@link Position} for the given {@link Player}}
-     * @param from the {@link Position} to move from
+     *
+     * @param from   the {@link Position} to move from
      * @param player the {@link Player} to move
      */
     public ArrayList<Position> getLegalMoves(Position from, Player player) {

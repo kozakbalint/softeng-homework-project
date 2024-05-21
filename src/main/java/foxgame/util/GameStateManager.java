@@ -43,7 +43,7 @@ public class GameStateManager {
      * Saves the state of the game to the given path.
      *
      * @param gameState the state to save
-     * @param savePath the path to save the state to
+     * @param savePath  the path to save the state to
      * @throws IOException if an I/O error occurs
      */
     public void saveState(GameState gameState, String savePath) throws IOException {
@@ -59,7 +59,7 @@ public class GameStateManager {
      * Applies the given state to the game state.
      *
      * @param gameState the game state to apply the state to
-     * @param state the state to apply
+     * @param state     the state to apply
      */
     public void applyState(FoxGameState gameState, GameState state) {
         for (var move : state.moves()) {

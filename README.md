@@ -1,9 +1,12 @@
 # Homework Project: Rókafogó (2.6.)
 
 ## Játékleírás:
-A játék egy sakktáblán játszható 4 sötét és 1 világos gyaloggal, melyek a kezdőállásban az [ábrán](#alapfelállás) látható módon helyezkednek el. A
+
+A játék egy sakktáblán játszható 4 sötét és 1 világos gyaloggal, melyek a kezdőállásban az [ábrán](#alapfelállás)
+látható módon helyezkednek el. A
 sötét gyalogok a kutyák, a világos gyalog a róka. Az egyik játékos a kutyákat,
 a másik a rókát irányítja. A játékosok felváltva következnek lépni:
+
 - A kutyák átlósan léphetnek egy mezőt, de csak előre.
 - A róka szintén átlósan egy mezőt léphet, de mozoghat hátrafelé is.
 
@@ -12,9 +15,11 @@ kutyákat vezető játékos akkor nyer, ha a rókát olyan helyzetbe kényszerí
 amelyben nem tud léepni.
 
 ## Alapfelállás:
+
 ![Alap felállás](https://lichess1.org/export/fen.gif?fen=2P5/8/8/8/8/8/8/1p1p1p1p_w_-_-_0_1&color=white)
 
 ## Egy PLAYER_ONE győztes játszma:
+
 1. PLAYER_1: from: 0 2 to: 1 1
 2. PLAYER_2: from: 7 1 to: 6 2
 3. PLAYER_1: from: 1 1 to: 2 0
@@ -32,6 +37,7 @@ amelyben nem tud léepni.
 PLAYER_1 wins!
 
 ## Egy PLAYER_TWO győztes játszma:
+
 1. PLAYER_1: from: 0 2 to: 1 1
 2. PLAYER_2: from: 7 1 to: 6 0
 3. PLAYER_1: from: 1 1 to: 0 0
