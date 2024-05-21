@@ -20,7 +20,7 @@ public class ZoneDateTimeAdapter extends TypeAdapter<ZonedDateTime> {
     /**
      * Writes the given {@link ZonedDateTime} object to the given {@link JsonWriter}.
      *
-     * @param jsonWriter the {@link JsonWriter} to write to
+     * @param jsonWriter    the {@link JsonWriter} to write to
      * @param zonedDateTime the {@link ZonedDateTime} object to write
      * @throws IOException if an I/O error occurs
      */

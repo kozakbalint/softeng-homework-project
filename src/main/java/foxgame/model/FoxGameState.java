@@ -38,6 +38,7 @@ public class FoxGameState implements TwoPhaseMoveState<Position> {
 
     /**
      * {@return whether it is legal to move from the given {@link Position}}
+     *
      * @param from the {@link Position} to move from
      */
     @Override
@@ -50,8 +51,9 @@ public class FoxGameState implements TwoPhaseMoveState<Position> {
 
     /**
      * {@return whether it is legal to move from the given {@link Position} to another {@link Position}}
+     *
      * @param from the {@link Position} to move from
-     * @param to the {@link Position} to move to
+     * @param to   the {@link Position} to move to
      */
     @Override
     public boolean isLegalMove(Position from, Position to) {
@@ -63,8 +65,9 @@ public class FoxGameState implements TwoPhaseMoveState<Position> {
 
     /**
      * Makes a move from the given {@link Position} to another {@link Position}.
+     *
      * @param from the {@link Position} to move from
-     * @param to the {@link Position} to move to
+     * @param to   the {@link Position} to move to
      */
     @Override
     public void makeMove(Position from, Position to) {
@@ -87,9 +90,9 @@ public class FoxGameState implements TwoPhaseMoveState<Position> {
      */
     @Override
     public boolean isGameOver() {
-        var foxPosition = getFoxPosition();
+        var foxPosition = getPlayerPositions(Player.PLAYER_1).get(0);
         if (!hasLegalMove(foxPosition, Player.PLAYER_1)) return true;
-        var dogPositions = getDogsPosition();
+        var dogPositions = getPlayerPositions(Player.PLAYER_2);
         var lastDogRow = dogPositions.stream().map(Position::row).max(Integer::compareTo).orElseThrow();
         return foxPosition.row() >= lastDogRow;
     }
@@ -102,11 +105,12 @@ public class FoxGameState implements TwoPhaseMoveState<Position> {
         if (!isGameOver()) {
             return Status.IN_PROGRESS;
         }
-        return isGameOver() && !hasLegalMove(getFoxPosition(), Player.PLAYER_1) ? Status.PLAYER_2_WINS : Status.PLAYER_1_WINS;
+        return isGameOver() && !hasLegalMove(getPlayerPositions(Player.PLAYER_1).get(0), Player.PLAYER_1) ? Status.PLAYER_2_WINS : Status.PLAYER_1_WINS;
     }
 
     /**
      * {@return the {@link Piece} at the given row and column index of the board}
+     *
      * @param i the row of the {@code board}
      * @param j the column of the {@code board}
      */
@@ -114,29 +118,10 @@ public class FoxGameState implements TwoPhaseMoveState<Position> {
         return board[i][j].getReadOnlyProperty();
     }
 
-    private Position getFoxPosition() {
-        var position = new Position(-1, -1);
-        for (int i = 0; i < BOARD_SIZE; i++) {
-            for (int j = 0; j < BOARD_SIZE; j++) {
-                if (board[i][j].get() == Piece.FOX) position = new Position(i, j);
-            }
-        }
-        return position;
-    }
-
-    private ArrayList<Position> getDogsPosition() {
-        ArrayList<Position> positions = new ArrayList<>();
-        for (int i = 0; i < BOARD_SIZE; i++) {
-            for (int j = 0; j < BOARD_SIZE; j++) {
-                if (board[i][j].get() == Piece.DOG) positions.add(new Position(i, j));
-            }
-        }
-        return positions;
-    }
-
     /**
      * {@return the legal moves from the given {@link Position} for the given {@link Player}}
-     * @param from the {@link Position} to move from
+     *
+     * @param from   the {@link Position} to move from
      * @param player the {@link Player} to move
      */
     public ArrayList<Position> getLegalMoves(Position from, Player player) {
@@ -158,22 +143,19 @@ public class FoxGameState implements TwoPhaseMoveState<Position> {
         return positions;
     }
 
-    private boolean hasLegalMove(Position from, Player player) {
-        for (int i = from.row() - 1; i <= from.row() + 1; i++) {
-            for (int j = from.col() - 1; j <= from.col() + 1; j++) {
-                if (i == from.row() && j == from.col()) {
-                    continue;
-                }
-                if (isPlayerOne(player) && isOnBoard(i, j) && isDiagonalMove(from, new Position(i, j)) && isEmpty(i, j)) {
-                    return true;
-                }
-
-                if (!isPlayerOne(player) && isOnBoard(i, j) && isForwardDiagonalMove(from, new Position(i, j)) && isEmpty(i, j)) {
-                    return true;
-                }
+    private ArrayList<Position> getPlayerPositions(Player player) {
+        ArrayList<Position> positions = new ArrayList<>();
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            for (int j = 0; j < BOARD_SIZE; j++) {
+                if (isPlayerOne(player) && board[i][j].get() == Piece.FOX) positions.add(new Position(i, j));
+                if (!isPlayerOne(player) && board[i][j].get() == Piece.DOG) positions.add(new Position(i, j));
             }
         }
-        return false;
+        return positions;
+    }
+
+    private boolean hasLegalMove(Position from, Player player) {
+        return !getLegalMoves(from, player).isEmpty();
     }
 
     private boolean isPlayerOne() {

@@ -28,8 +28,10 @@ public class NewGameController {
 
     @FXML
     private void initialize() {
+        newgameButton.setDisable(true);
+        playerTwoNameField.setDisable(true);
+        
         playerOneNameField.textProperty().addListener((observable, oldValue, newValue) -> playerTwoNameField.setDisable(newValue.isEmpty()));
-
         playerTwoNameField.textProperty().addListener((observable, oldValue, newValue) -> newgameButton.setDisable(newValue.isEmpty()));
     }
 
