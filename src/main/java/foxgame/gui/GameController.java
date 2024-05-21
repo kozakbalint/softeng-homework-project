@@ -3,10 +3,7 @@ package foxgame.gui;
 import foxgame.model.FoxGameState;
 import foxgame.model.Piece;
 import foxgame.model.Position;
-import foxgame.util.GameResult;
-import foxgame.util.GameState;
-import foxgame.util.GameStateManager;
-import foxgame.util.JsonGameResultManager;
+import foxgame.util.*;
 import game.State;
 import game.util.TwoPhaseMoveSelector;
 import javafx.application.Platform;
@@ -72,7 +69,7 @@ public class GameController {
         items = FXCollections.observableArrayList(moves);
         gameState = new FoxGameState();
         moveSelector = new TwoPhaseMoveSelector<>(gameState);
-        gameStateManager = new GameStateManager();
+        gameStateManager = new JsonGameStateManager();
         jsonGameResultManager = new JsonGameResultManager("./results.json");
 
         moveHistory.setItems(items);

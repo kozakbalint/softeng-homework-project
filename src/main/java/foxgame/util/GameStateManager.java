@@ -11,15 +11,7 @@ import java.io.IOException;
 /**
  * Manages the state of the game.
  */
-public class GameStateManager {
-    Gson gson;
-
-    /**
-     * Constructs a new {@code GameStateManager}.
-     */
-    public GameStateManager() {
-        gson = new Gson();
-    }
+public interface GameStateManager {
 
     /**
      * Loads the state of the game from the given path.
@@ -28,16 +20,7 @@ public class GameStateManager {
      * @return the loaded state
      * @throws IOException if an I/O error occurs
      */
-    public GameState loadState(String path) throws IOException {
-        GameState gameState;
-        try (FileReader reader = new FileReader(path)) {
-            gameState = gson.fromJson(reader, GameState.class);
-            return gameState;
-        } catch (IOException e) {
-            Logger.error(e);
-            throw new IOException("Failed to load state");
-        }
-    }
+    GameState loadState(String path) throws IOException;
 
     /**
      * Saves the state of the game to the given path.
@@ -46,14 +29,7 @@ public class GameStateManager {
      * @param savePath  the path to save the state to
      * @throws IOException if an I/O error occurs
      */
-    public void saveState(GameState gameState, String savePath) throws IOException {
-        try (FileWriter writer = new FileWriter(savePath)) {
-            gson.toJson(gameState, writer);
-        } catch (IOException e) {
-            Logger.error(e);
-            throw new IOException("Failed to save state");
-        }
-    }
+    void saveState(GameState gameState, String savePath) throws IOException;
 
     /**
      * Applies the given state to the game state.
@@ -61,7 +37,7 @@ public class GameStateManager {
      * @param gameState the game state to apply the state to
      * @param state     the state to apply
      */
-    public void applyState(FoxGameState gameState, GameState state) {
+    default void applyState(FoxGameState gameState, GameState state) {
         for (var move : state.moves()) {
             if (gameState.isLegalMove(move.from(), move.to())) {
                 gameState.makeMove(move.from(), move.to());
