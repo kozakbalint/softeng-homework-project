@@ -41,55 +41,40 @@ import java.util.Objects;
  * Controller for the game view.
  */
 public class GameController {
-    ObservableList<ListViewItem> items;
     @FXML
     private GridPane board;
     @FXML
     private ListView<ListViewItem> moveHistory;
-    private ArrayList<ListViewItem> moves;
+
+    private ArrayList<ListViewItem> moves = new ArrayList<>();
     private FoxGameState gameState;
-
     private TwoPhaseMoveSelector<Position> moveSelector;
-
+    private ObservableList<ListViewItem> items = FXCollections.observableArrayList(moves);
     private ImageStorage<Piece> imageStorage = new EnumImageStorage<>(Piece.class);
-
-    private GameStateManager gameStateManager;
-
-    private JsonGameResultManager jsonGameResultManager;
-
+    private JsonGameStateManager gameStateManager = new JsonGameStateManager();
+    private JsonGameResultManager jsonGameResultManager = new JsonGameResultManager("results.json");
     private File saveFile = new File("");
-
     private String playerOneName;
     private String playerTwoName;
+
+    public void setPlayerNames(String playerOneName, String playerTwoName) {
+        this.playerOneName = playerOneName;
+        this.playerTwoName = playerTwoName;
+    }
+
+    public void setSaveFile(File file) {
+        this.saveFile = file;
+    }
 
     @FXML
     private void initialize() {
         board.getChildren().clear();
-        moves = new ArrayList<>();
-        items = FXCollections.observableArrayList(moves);
+        moves.clear();
+        items.clear();
         gameState = new FoxGameState();
         moveSelector = new TwoPhaseMoveSelector<>(gameState);
-        gameStateManager = new JsonGameStateManager();
-        jsonGameResultManager = new JsonGameResultManager("./results.json");
 
-        moveHistory.setItems(items);
-        moveHistory.getStyleClass().add("list-view");
-        moveHistory.setCellFactory(param -> new ListCell<>() {
-            @Override
-            protected void updateItem(ListViewItem item, boolean empty) {
-                super.updateItem(item, empty);
-
-                if (empty || item == null) {
-                    setText(null);
-                    return;
-                }
-                if (item.move() != null) {
-                    setText(String.format("from: %s\tto: %s", item.move().from(), item.move().to()));
-                } else {
-                    setText(item.message());
-                }
-            }
-        });
+        setupMoveHistory();
 
         for (int i = 0; i < board.getRowCount(); i++) {
             for (int j = 0; j < board.getColumnCount(); j++) {
@@ -98,24 +83,31 @@ public class GameController {
             }
         }
 
-        if (saveFile.getPath().isEmpty()) {
-            Logger.debug("New Game started.");
-        } else {
+        if (!saveFile.getPath().isEmpty()) {
             Logger.debug("Loading file: {}", saveFile);
             try {
                 var loadedState = gameStateManager.loadState(saveFile.getPath());
                 playerOneName = loadedState.playerOneName();
                 playerTwoName = loadedState.playerTwoName();
                 gameStateManager.applyState(gameState, loadedState);
+                for (int i = 0; i < loadedState.moves().size(); i++) {
+                    items.add(new ListViewItem(null, loadedState.moves().get(i)));
+                }
+                if (gameState.isGameOver()) gameOver();
+                Logger.debug("Game continued between {} and {}", playerOneName, playerTwoName);
+                return;
             } catch (Exception e) {
                 Logger.error("Failed to load game state from file: {}", saveFile);
             }
         }
+
+        Logger.debug("New Game started.");
     }
 
     @FXML
     private void onNew() {
         Logger.debug("New Game started.");
+        saveFile = new File("");
         initialize();
     }
 
@@ -123,12 +115,19 @@ public class GameController {
     private void onSave() {
         if (!saveFile.getPath().isEmpty()) {
             try {
-                gameStateManager.saveState(new GameState(saveFile.getName(), playerOneName, playerTwoName, items.stream().map(ListViewItem::move).filter(Objects::nonNull).toList()), saveFile.getPath());
+                GameState gameState = new GameState(
+                        saveFile.getName(),
+                        playerOneName,
+                        playerTwoName,
+                        items.stream().map(ListViewItem::move).filter(Objects::nonNull).toList());
+                gameStateManager.saveState(gameState, saveFile.getPath());
+                Logger.debug("Saving file: {}", saveFile);
                 return;
             } catch (Exception e) {
                 Logger.error("Failed to save game state to file: {}", saveFile);
             }
         }
+
         var fileChooser = new FileChooser();
         fileChooser.setTitle("Save Game");
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Fox Game Save Files", "*.fox"));
@@ -136,7 +135,12 @@ public class GameController {
         if (file != null) {
             try {
                 Logger.debug("Saving file: {}", file);
-                gameStateManager.saveState(new GameState(file.getName(), playerOneName, playerTwoName, items.stream().map(ListViewItem::move).filter(Objects::nonNull).toList()), file.getPath());
+                GameState gameState = new GameState(
+                        file.getName(),
+                        playerOneName,
+                        playerTwoName,
+                        items.stream().map(ListViewItem::move).filter(Objects::nonNull).toList());
+                gameStateManager.saveState(gameState, file.getPath());
                 saveFile = new File(file.getAbsolutePath());
             } catch (Exception e) {
                 Logger.error("Failed to save game state to file: {}", file);
@@ -150,20 +154,16 @@ public class GameController {
         fileChooser.setTitle("Load");
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Fox Game Save Files", "*.fox"));
         var file = fileChooser.showOpenDialog(null);
-        if (file != null) {
 
+        if (file != null) {
             try {
                 Logger.debug("Opening file: {}", file);
                 GameState loadState = gameStateManager.loadState(file.getPath());
-                initialize();
-                gameStateManager.applyState(gameState, loadState);
+
                 playerOneName = loadState.playerOneName();
                 playerTwoName = loadState.playerTwoName();
                 saveFile = new File(file.getAbsolutePath());
-                for (int i = 0; i < loadState.moves().size(); i++) {
-                    items.add(new ListViewItem(null, loadState.moves().get(i)));
-                }
-                if (gameState.isGameOver()) gameOver();
+                initialize();
             } catch (Exception e) {
                 Logger.error("Failed to load game state from file: {}", file);
             }
@@ -174,6 +174,28 @@ public class GameController {
     private void onQuit() {
         Logger.debug("Terminating");
         Platform.exit();
+    }
+
+    private void setupMoveHistory() {
+        moveHistory.setItems(items);
+        moveHistory.getStyleClass().add("list-view");
+        moveHistory.setCellFactory(param -> new ListCell<>() {
+            @Override
+            protected void updateItem(ListViewItem item, boolean empty) {
+                super.updateItem(item, empty);
+
+                if (empty || item == null) {
+                    setText(null);
+                    return;
+                }
+
+                if (item.move() != null) {
+                    setText(String.format("from: %s\tto: %s", item.move().from(), item.move().to()));
+                } else {
+                    setText(item.message());
+                }
+            }
+        });
     }
 
     private StackPane createSquare(int i, int j) {
@@ -258,13 +280,18 @@ public class GameController {
         }
         Logger.debug("Selected: {}", position);
         if (moveSelector.getPhase() == TwoPhaseMoveSelector.Phase.SELECT_TO && !gameState.isGameOver()) {
-            var legalMoves = gameState.getLegalMoves(position, gameState.getNextPlayer());
-            var square = getSquare(position);
-            square.getStyleClass().add("square-selected");
-            for (var move : legalMoves) {
-                var nextSquare = getSquare(move);
-                nextSquare.getChildren().add(makeCircle(nextSquare.getWidth(), nextSquare.getHeight()));
-            }
+            showLegalMoves(position);
+        }
+    }
+
+    private void showLegalMoves(Position position) {
+        var legalMoves = gameState.getLegalMoves(position, gameState.getNextPlayer());
+        var square = getSquare(position);
+        square.getStyleClass().add("square-selected");
+
+        for (var move : legalMoves) {
+            var legalSquare = getSquare(move);
+            legalSquare.getChildren().add(makeCircle(legalSquare.getWidth(), legalSquare.getHeight()));
         }
     }
 
@@ -324,14 +351,5 @@ public class GameController {
         Stage stage = (Stage) board.getScene().getWindow();
         stage.setScene(scene);
         stage.show();
-    }
-
-    public void setPlayerNames(String playerOneName, String playerTwoName) {
-        this.playerOneName = playerOneName;
-        this.playerTwoName = playerTwoName;
-    }
-
-    public void setSaveFile(File file) {
-        this.saveFile = file;
     }
 }
