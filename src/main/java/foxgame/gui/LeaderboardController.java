@@ -44,8 +44,8 @@ public class LeaderboardController {
             Logger.error("Failed to load leaderboard: {}", e.getMessage());
         }
     }
-
-    public void onNewGame(ActionEvent event) {
+    @FXML
+    private void onNewGame(ActionEvent event) {
         Logger.debug("Starting new game");
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/newgame.fxml"));
@@ -58,7 +58,8 @@ public class LeaderboardController {
         }
     }
 
-    public void onQuit(ActionEvent event) {
+    @FXML
+    private void onQuit(ActionEvent event) {
         Logger.debug("Terminating");
         Platform.exit();
     }

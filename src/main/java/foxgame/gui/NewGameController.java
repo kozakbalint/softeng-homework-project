@@ -35,7 +35,8 @@ public class NewGameController {
         playerTwoNameField.textProperty().addListener((observable, oldValue, newValue) -> newgameButton.setDisable(newValue.isEmpty()));
     }
 
-    public void onNewGame(ActionEvent event) throws IOException {
+    @FXML
+    private void onNewGame(ActionEvent event) throws IOException {
         Logger.debug("Starting new game with players {} and {}", playerOneNameField.getText(), playerTwoNameField.getText());
         GameController controller = new GameController();
         controller.setPlayerNames(playerOneNameField.getText(), playerTwoNameField.getText());

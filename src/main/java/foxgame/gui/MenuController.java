@@ -2,6 +2,7 @@ package foxgame.gui;
 
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -17,7 +18,8 @@ import java.io.IOException;
  */
 public class MenuController {
 
-    public void onNewGame(ActionEvent actionEvent) {
+    @FXML
+    private void onNewGame(ActionEvent actionEvent) {
         Logger.debug("Starting new game");
         try {
             loadStage("/newgame.fxml", actionEvent, null);
@@ -26,7 +28,8 @@ public class MenuController {
         }
     }
 
-    public void onLoadGame(ActionEvent actionEvent) {
+    @FXML
+    private void onLoadGame(ActionEvent actionEvent) {
         var fileChooser = new FileChooser();
         fileChooser.setTitle("Load Game");
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Fox Game Save Files", "*.fox"));
@@ -43,7 +46,8 @@ public class MenuController {
         }
     }
 
-    public void onQuit(ActionEvent actionEvent) {
+    @FXML
+    private void onQuit(ActionEvent actionEvent) {
         Logger.debug("Terminating");
         Platform.exit();
     }
