@@ -57,11 +57,22 @@ public class GameController {
     private String playerOneName;
     private String playerTwoName;
 
+    /**
+     * Sets the names of the players.
+     *
+     * @param playerOneName the name of the first player
+     * @param playerTwoName the name of the second player
+     */
     public void setPlayerNames(String playerOneName, String playerTwoName) {
         this.playerOneName = playerOneName;
         this.playerTwoName = playerTwoName;
     }
 
+    /**
+     * Sets the save file.
+     *
+     * @param file the save file
+     */
     public void setSaveFile(File file) {
         this.saveFile = file;
     }

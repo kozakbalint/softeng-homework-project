@@ -7,6 +7,9 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
+/**
+ * A class that manages the loading and saving of game states in JSON format.
+ */
 public class JsonGameStateManager implements GameStateManager{
     private Gson gson = new Gson();
     @Override
